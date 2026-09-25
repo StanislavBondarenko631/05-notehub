@@ -1,4 +1,4 @@
-export type NoteTag = "todo" | "personal" | "work" | "shopping";
+export type NoteTag = "Todo" | "Work" | "Personal" | "Meeting" | "Shopping";
 
 export default interface Note {
   id: string;

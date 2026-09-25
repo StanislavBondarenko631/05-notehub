@@ -1,21 +1,13 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import styles from "./NoteList.module.css";
-import { deleteNote, fetchNotes } from "../../services/noteService";
-import { useEffect } from "react";
-import Loader from "../Loader/Loader";
-import ErrorView from "../ErrorView/ErrorView";
+import { deleteNote } from "../../services/noteService";
+import type Note from "../../types/note";
 
 interface NoteListProps {
-  page: number;
-  search: string;
-  onTotalPagesChange: (total: number) => void;
+  notes: Note[];
 }
 
-export default function NoteList({
-  page,
-  search,
-  onTotalPagesChange,
-}: NoteListProps) {
+export default function NoteList({ notes }: NoteListProps) {
   const queryClient = useQueryClient();
 
   const deleteMutation = useMutation({
@@ -25,34 +17,8 @@ export default function NoteList({
     },
   });
 
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ["notes", { page, search }],
-    queryFn: () => fetchNotes({ page, search }),
-  });
-
-  useEffect(() => {
-    if (data?.totalPages !== undefined) {
-      onTotalPagesChange(data.totalPages);
-    }
-  }, [data?.totalPages, onTotalPagesChange]);
-
-  if (isLoading) {
-    return <Loader />;
-  }
-  if (isError) {
-    return (
-      <ErrorView message="Failed to load notes. Please try again later." />
-    );
-  }
-
-  const notes = data?.notes || [];
-
   if (notes.length === 0) {
-    return search.trim() !== "" ? (
-      <ErrorView message="No notes found matching your search." />
-    ) : (
-      <ErrorView message="Your note collection is empty. Create your first note!" />
-    );
+    return null;
   }
 
   return (

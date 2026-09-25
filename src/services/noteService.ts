@@ -52,8 +52,6 @@ export const createNote = async ({
 };
 
 export const deleteNote = async (id: string): Promise<Note> => {
-  const response = await noteApi.delete<Note>(
-    `https://notehub-public.goit.study/api/notes/${id}`,
-  );
+  const response = await noteApi.delete<Note>(`/${id}`);
   return response.data;
 };
