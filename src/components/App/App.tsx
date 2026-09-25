@@ -6,7 +6,7 @@ import Modal from "../Modal/Modal";
 import NoteForm from "../NoteForm/NoteForm";
 import { useDebouncedCallback } from "use-debounce";
 import SearchBox from "../SearchBox/SearchBox";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { fetchNotes } from "../../services/noteService";
 import Loader from "../Loader/Loader";
 import ErrorView from "../ErrorView/ErrorView";
@@ -19,6 +19,7 @@ export default function App() {
   const { data, isLoading, isError } = useQuery({
     queryKey: ["notes", { page, search }],
     queryFn: () => fetchNotes({ page, search }),
+    placeholderData: keepPreviousData,
   });
 
   const totalPages = data?.totalPages || 1;
