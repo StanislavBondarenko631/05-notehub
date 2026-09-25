@@ -2,6 +2,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import styles from "./NoteList.module.css";
 import { deleteNote, fetchNotes } from "../../services/noteService";
 import { useEffect } from "react";
+import Loader from "../Loader/Loader";
+import ErrorView from "../ErrorView/ErrorView";
 
 interface NoteListProps {
   page: number;
@@ -35,16 +37,22 @@ export default function NoteList({
   }, [data?.totalPages, onTotalPagesChange]);
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <Loader />;
   }
   if (isError) {
-    return <div>Error loading notes</div>;
+    return (
+      <ErrorView message="Failed to load notes. Please try again later." />
+    );
   }
 
   const notes = data?.notes || [];
 
   if (notes.length === 0) {
-    return null;
+    return search.trim() !== "" ? (
+      <ErrorView message="No notes found matching your search." />
+    ) : (
+      <ErrorView message="Your note collection is empty. Create your first note!" />
+    );
   }
 
   return (
