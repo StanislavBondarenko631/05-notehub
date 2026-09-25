@@ -1,12 +1,24 @@
 import { useQuery } from "@tanstack/react-query";
 import styles from "./NoteList.module.css";
 import { fetchNotes } from "../../services/noteService";
+import { useEffect } from "react";
 
-export default function NoteList() {
+interface NoteListProps {
+  page: number;
+  onTotalPagesChange: (total: number) => void;
+}
+
+export default function NoteList({ page, onTotalPagesChange }: NoteListProps) {
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["notes", { page: 1, search: "" }],
-    queryFn: () => fetchNotes({ page: 1, search: "" }),
+    queryKey: ["notes", { page, search: "" }],
+    queryFn: () => fetchNotes({ page, search: "" }),
   });
+
+  useEffect(() => {
+    if (data?.totalPages !== undefined) {
+      onTotalPagesChange(data.totalPages);
+    }
+  }, [data?.totalPages, onTotalPagesChange]);
 
   if (isLoading) {
     return <div>Loading...</div>;
