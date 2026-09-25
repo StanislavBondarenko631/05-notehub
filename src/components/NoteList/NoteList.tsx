@@ -1,17 +1,31 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import styles from "./NoteList.module.css";
-import { fetchNotes } from "../../services/noteService";
+import { deleteNote, fetchNotes } from "../../services/noteService";
 import { useEffect } from "react";
 
 interface NoteListProps {
   page: number;
+  search: string;
   onTotalPagesChange: (total: number) => void;
 }
 
-export default function NoteList({ page, onTotalPagesChange }: NoteListProps) {
+export default function NoteList({
+  page,
+  search,
+  onTotalPagesChange,
+}: NoteListProps) {
+  const queryClient = useQueryClient();
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteNote,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notes"] });
+    },
+  });
+
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["notes", { page, search: "" }],
-    queryFn: () => fetchNotes({ page, search: "" }),
+    queryKey: ["notes", { page, search }],
+    queryFn: () => fetchNotes({ page, search }),
   });
 
   useEffect(() => {
@@ -41,7 +55,15 @@ export default function NoteList({ page, onTotalPagesChange }: NoteListProps) {
           <p className={styles.content}>{note.content}</p>
           <div className={styles.footer}>
             <span className={styles.tag}>{note.tag}</span>
-            <button className={styles.button}>Delete</button>
+            <button
+              className={styles.button}
+              onClick={() => {
+                deleteMutation.mutate(note.id);
+              }}
+              disabled={deleteMutation.isPending}
+            >
+              Delete
+            </button>
           </div>
         </li>
       ))}
