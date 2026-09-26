@@ -55,11 +55,9 @@ export default function App() {
 
       {!isLoading && !isError && (
         <>
-          {/* Если заметки есть — рендерим список и передаем их в пропс notes */}
           {(data?.notes || []).length > 0 ? (
             <NoteList notes={data?.notes || []} />
           ) : (
-            /* Если заметок нет — показываем сообщение в зависимости от того, активен ли поиск */
             <ErrorView
               message={
                 search.trim() !== ""
